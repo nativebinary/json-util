@@ -1,0 +1,69 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+.jsonUtil .wrap {
+  width: 98%;
+  margin: 0 auto;
+}
+.jsonUtil table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.jsonUtil .json {
+  border: 1px solid #bbb;
+  font-family: monospace;
+  line-height: 150%;
+  background-color: #fff;
+  word-break: break-all;
+}
+.jsonUtil .json .string {
+  color: #f00;
+}
+.jsonUtil .json .number {
+  color: #090;
+}
+.jsonUtil .json .boolean {
+  color: #00f;
+}
+.jsonUtil .json .null {
+  color: #f0f;
+}
+.jsonUtil .json .key {
+  color: #777;
+}
+.jsonUtil .json .string,
+.jsonUtil .json .number,
+.jsonUtil .json .boolean,
+.jsonUtil .json .null {
+  font-weight: bold;
+}
+.jsonUtil .json .pojo {
+  cursor: pointer;
+}
+.jsonUtil .json .pojo.fold:before {
+  content: '+';
+}
+.jsonUtil .json .pojo:before {
+  content: '-';
+}
+.jsonUtil .json .pojo.fold .members {
+  display: none;
+}
+.jsonUtil .src {
+  width: 100%;
+  height: 300px;
+}
+.jsonUtil .dstJava {
+  width: 100%;
+  height: 500px;
+  white-space: pre;
+}
+.jsonUtil .dstPretty {
+  width: 100%;
+  height: 500px;
+  white-space: pre;
+  overflow: scroll;
+}
