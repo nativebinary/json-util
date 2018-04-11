@@ -58,12 +58,12 @@ body {
 }
 .jsonUtil .dstJava {
   width: 100%;
-  height: 100%;
+  height: 500px;
   white-space: pre;
 }
 .jsonUtil .dstPretty {
   width: 100%;
-  height: 500px;
+  height: 100%;
   white-space: pre;
   overflow: scroll;
 }
