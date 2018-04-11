@@ -47,15 +47,15 @@ html, body {
 
         .pojo {
             cursor: pointer;
-        }
-        .pojo.fold:before {
-            content: '+'
-        }
-        .pojo:before {
-            content: '-'
-        }
-        .pojo.fold .members {
-            display: none;
+            &.fold:before {
+                content: '+'
+            }
+            &:before {
+                content: '-'
+            }
+            &.fold .members {
+                display: none;
+            }
         }
     }
 
