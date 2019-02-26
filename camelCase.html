@@ -47,6 +47,11 @@
                     return "; // " + match.toUpperCase();
                 });
                 arrayResult.push("    public int " + v + ";");
+            } else if (0 <= v.search(/ (datetime|date)/)) {
+                v = v.replace(/ (datetime|date)(.*)/, function(match){
+                    return "; // " + match.toUpperCase();
+                });
+                arrayResult.push("    public Date " + v + ";");
             } else {
 
                 arrayResult.push(v);
