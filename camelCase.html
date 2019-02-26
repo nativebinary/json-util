@@ -9,252 +9,81 @@
 
     <script type="text/javascript" src="//cdn.jsdelivr.net/json2/0.2/json2.js"></script>
     <script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1.11.0/jquery.min.js"></script>
+    <script type="text/javascript" src="polyfill.js"></script>
 
     <script type="text/javascript">
-        function syntaxHighlightJSON(json) {
-            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            json = json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-                var cls = 'number';
-                if (/^"/.test(match)) {
-                    if (/:$/.test(match)) {
-                        cls = 'key';
-                    } else {
-                        cls = 'string';
-                    }
-                } else if (/true|false/.test(match)) {
-                    cls = 'boolean';
-                } else if (/null/.test(match)) {
-                    cls = 'null';
-                }
-                return '<span class="' + cls + '">' + match + '</span>';
-            });
-            json = json.replace(/(\{|\[)/g, "<span class='pojo'>$&<span class='members'>").replace(/(\]|\})/g, '</span>$&</span>');
-            return json;
+
+    function camelCase(v) {
+        v =  v.toLowerCase();
+
+        function underToUpperCase(match) {
+            return match.substring(1).toUpperCase();
         }
 
+        return v.replace(/_([a-z])/g, underToUpperCase);
+    }
 
+    function generate(sql) {
 
-        function generate(name, obj, depth, withDeclaration) {
-            var result = "";
-            var type = typeof obj;
+        var arrayResult = [];
+        var arrayLine = sql.split("\n");
+        arrayLine.forEach(function(v, i){
 
-            if(Array.isArray(obj))
-            {
-                if(isAllElementString(obj)) {
-                    result += makeStringIndent(depth) + "public List<String> " + name + ";\n";
-                } else if(isAllElementBoolean(obj)) {
-                    result += makeStringIndent(depth) + "public List<Boolean> " + name + ";\n";
-                } else if(isAllElementInt(obj)) {
-                    result += makeStringIndent(depth) + "public List<Integer> " + name + ";\n";
-                } else if(isAllElementNumber(obj)) {
-                    result += makeStringIndent(depth) + "public List<Double> " + name + ";\n";
-                } else {
-                    var aggregate = {};
-                    $.each(obj, function (index, value) {
-                        $.extend(aggregate, value);
-                    });
-                    result += makeStringIndent(depth) + "public List<" + getTypeName(name) + "> " + name + ";\n";
-                    result += generate(name, aggregate, depth, false);
-                }
+            v = camelCase(v.trim().toLowerCase());
+
+            if (0 <= v.indexOf("create table")) {
+                v = v.replace('create table', '').trim();
+                v = v[0].toUpperCase() + v.substring(1);
+                arrayResult.push("public class " + v);
+            } else if (0 <= v.search(/ (nvarchar|varchar|nchar|char)/)) {
+                v = v.substring(0, v.search(/ (nvarchar|varchar|nchar|char)/));
+                arrayResult.push("    public String " + v + ";");
+            } else if (0 <= v.search(/ (number|int)/)) {
+                v = v.substring(0, v.search(/ (number|int)/));
+                arrayResult.push("    public int " + v + ";");
+            } else {
+
+                arrayResult.push(v);
             }
-            else if(type == 'object')
-            {
 
-                if (obj == null) {
-                    result+=makeStringIndent(depth)+"public Object "+name+"; // json value is null. data check plz.\n";
-                } else {
+        });
+        
 
-                    if(withDeclaration)
-                        result+=makeStringIndent(depth)+"public "+getTypeName(name)+" "+name+";\n";
-                    result+=makeStringIndent(depth)+"public static class "+getTypeName(name)+" {\n";
-                    depth++;
-                    $.each(obj,function(index,value){
-                        result+=generate(index,value,depth,true);
-                    });
-                    depth--;
-                    result+=makeStringIndent(depth)+"}\n";
-                }
-            }
-            else if(type == 'boolean')
-            {
-                result += makeStringIndent(depth) + "public boolean " + name + ";\n";
-            }
-            else if(type == 'number')
-            {
-                if(obj % 1 == 0)
-                {
-                    result += makeStringIndent(depth) + "public int " + name + ";\n";
-                }
-                else
-                {
-                    result += makeStringIndent(depth) + "public double " + name + ";\n";
-                }
-            }
-            else if(type == 'string')
-            {
-                result += makeStringIndent(depth) + "public String " + name + ";\n";
-            }
-            else {
-                result += makeStringIndent(depth) + "public ??? " + name + ";\n";
-            }
-            return result;
-        }
-        function makeStringIndent(depth) {
-            var result = '';
-            for(var i = 0; i < depth; i++) {
-                result += '    ';
-            }
-            return result;
-        }
 
-        function isAllElementTypeIs(array, type) {
-            for(var i = 0; i < array.length; i++) {
-                if(typeof array[i] != type)
-                    return false;
-            }
-            return true;
-        }
-
-        function isAllElementBoolean(array) {
-            return isAllElementTypeIs(array, "boolean");
-        }
-
-        function isAllElementInt(array) {
-            for(var i = 0; i < array.length; i++) {
-                if(typeof array[i] != 'number')
-                    return false;
-
-                if(array[i] % 1 != 0)
-                    return false;
-            }
-            return true;
-        }
-
-        function isAllElementNumber(array) {
-            return isAllElementTypeIs(array, "number");
-        }
-
-        function isAllElementString(array) {
-            return isAllElementTypeIs(array, "string");
-        }
-
-        function isInt(a) {
-
-        }
-        function getBoxingType(type)
-        {
-            if(type == 'int')
-                return 'Integer';
-
-            if(type == 'double')
-                return 'Double';
-
-            if(type == 'boolean')
-                return 'Boolean';
-
-            return "ERROR"
-        }
-
-        function getTypeName(name){
-            if(name.slice(0,4) == 'list')
-                return name.slice(4);
-
-            var s = name.charAt(0);
-            if(s.toUpperCase() == s)
-                return "_" + name;
-
-            return capitaliseFirstLetter(name);
-        }
-
-        function capitaliseFirstLetter(string)
-        {
-            return string.charAt(0).toUpperCase() + string.slice(1);
-        }
-
+        return arrayResult.join("\n");
+    }
 
         $(function(){
             $('.src').keyup(function () {
-                $('.dstPretty').html('');
+                
                 $('.dstJava').val('');
 
-                var obj = JSON.parse($('.src').val());
+                $('.dstJava').val(generate($(this).val()));
 
-                $('.dstPretty').html(syntaxHighlightJSON(JSON.stringify(obj, null, '    ')));
-                $('.dstJava').val(generate('root', obj, 0, false));
             }).scroll(function () {
                 $('.src').scrollTop
             }).keyup();
-            $('.numberType').click(function () {
-                $('.src').keyup();
-            });
-
-            $('.dstPretty').on('click', '.pojo', function () {
-                $(this).toggleClass('fold');
-                return false;
-            }).on('click', '.members', function () {
-                return false;
-            });
+            
         });
     </script>
 
 </head>
-<body class="jsonUtil">
+<body class="camelCaseUtil">
     <div class="wrap">
-        <h1>nativebinary - json-util</h1>
+        <h1>nativebinary - camelCaseUtil</h1>
 
-        <textarea class="src">
-{
-"s1": "s1",
-"s2": "55",
-"i1": 10,
-"i2": 20.0,
-"d1": 5.5,
-"d2": 55.55,
-"b1": true,
-"b2": false,
-"o1" : {
-"s1": "s1",
-"s2": "s2",
-"i1": 10,
-"i2": 20,
-"d1": 5.5,
-"d2": 55.55,
-"b1": true,
-"b2": false,
-"listAggregate": [
-{ "a": "A"},
-{ "b": "B"},
-{ "c": "C"},
-{ "d": "D"}
-],
-"listOfInt": [ 1, 2, 3, 4 ],
-"listOfDouble": [ 1.1, 2.2, 3.3, 4.4 ],
-"listOfBoolean": [ true, false, true, false ],
-"listOfString": [ "A", "B", "C", "D" ],
-"deep" : {
-"deep": {
-"deep": {
-"deep": {
-"deep1": {
-"empty": {
-}
-},
-"deep2": [1, 2, 3]
-}
-}
-}
-}
-},
-"O2" : {
-"i": 10
-}
-}
-    </textarea>
 
         <table style="height: 100%; width: 100%;">
             <tr>
                 <td width="50%">
-                    <div class="dstPretty json"></div>
+<textarea class="src">
+
+CREATE TABLE TABLE_NAME_UNDER_SCORE (
+    AAA_BBB           VARCHAR2(1) NOT NULL,
+    CCC_DDD_EEE       NUMBER(3)  NULL
+    
+);
+</textarea>
                 </td>
                 <td width="50%">
                     <textarea class="dstJava"></textarea>
