@@ -28,17 +28,17 @@
 
             v = camelCase(v.trim().toLowerCase());
 
-            v = v.replace(/\(/g, "{");
-            v = v.replace(/\)/g, "}");
 
 
             if (0 <= v.indexOf("create table")) {
                 v = v.replace('create table', '').trim();
                 v = v[0].toUpperCase() + v.substring(1);
-                v.end
+                v = v.replace(/\(/g, "{");
+                v = v.replace(/\)/g, "}");
+
                 arrayResult.push("public class " + v);
-            } else if (0 <= v.search(/ (nvarchar|varchar|nchar|char)/)) {
-                v = v.replace(/ (nvarchar|varchar|nchar|char)(.*)/, function(match){
+            } else if (0 <= v.search(/ (nvarchar|varchar|nchar|char|nclob|clob)/)) {
+                v = v.replace(/ (nvarchar|varchar|nchar|char|nclob|clob)(.*)/, function(match){
                     return "; // " + match.toUpperCase();
                 });
                 arrayResult.push("    public String " + v + ";");
@@ -53,6 +53,8 @@
                 });
                 arrayResult.push("    public Date " + v + ";");
             } else {
+                v = v.replace(/\(/g, "{");
+                v = v.replace(/\)/g, "}");
 
                 arrayResult.push(v);
             }
