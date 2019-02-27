@@ -1,0 +1,138 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>SqlCreateStatementToAhaWikiFormat</title>
+
+    <link rel="stylesheet" href="less.css">
+
+    <script type="text/javascript" src="//cdn.jsdelivr.net/json2/0.2/json2.js"></script>
+    <script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1.11.0/jquery.min.js"></script>
+    <script type="text/javascript" src="polyfill.js"></script>
+
+    <script type="text/javascript">
+
+        $(function(){
+            $('.src').keyup(function () {
+                var val = $(this).val();
+                var result = val
+                    .replace(/\n\t\t/g, " ")
+                    .split('\n')
+                    .map(function (l) {
+						return l
+							.replace(/^create table /i, '== ')
+							.replace(/^\(/, '[[[#!AhaTracTable tsv 1\nField\tType\tConstraints')
+							.replace(/^\);/, ']]]')
+							.replace(/^\t(\S+)\s+(\S+)\s+(.+?)/, '$1\t$2\t$3')
+							.replace(/,$/, '');
+					})
+                    .join('\n');
+                $('.dst').val(result);
+            }).keyup();
+            
+        });
+    </script>
+
+</head>
+<body class="SqlCreateStatementToAhaWikiFormat">
+    <div class="wrap">
+        <h1>nativebinary - SqlCreateStatementToAhaWikiFormat</h1>
+
+
+        <table style="height: 100%; width: 100%;">
+            <tr>
+                <td width="50%">
+<textarea class="src">
+
+create table Link
+(
+	src varchar(255) not null,
+	dst varchar(255) not null,
+	alias varchar(255) null,
+	primary key (src, dst)
+);
+
+create table Page
+(
+	name varchar(255) not null,
+	revision int not null,
+	time bigint null,
+	author text null,
+	remoteAddress text null,
+	content longtext null,
+	comment text null,
+	primary key (name, revision)
+);
+
+create table CosineSimilarity
+(
+	name1 varchar(255) not null,
+	name2 varchar(255) not null,
+	similarity double null,
+	primary key (name1, name2),
+	constraint fkCosineSimilarityName1
+		foreign key (name1) references Page (name),
+	constraint fkCosineSimilarityName2
+		foreign key (name2) references Page (name)
+);
+
+create table TermFrequency
+(
+	name varchar(255) not null,
+	term varchar(255) not null,
+	frequency int null,
+	primary key (name, term),
+	constraint fkTermFrequencyName
+		foreign key (name) references Page (name)
+);
+
+create table play_evolutions
+(
+	id int not null
+		primary key,
+	hash varchar(255) not null,
+	applied_at timestamp default CURRENT_TIMESTAMP not null,
+	apply_script mediumtext null,
+	revert_script mediumtext null,
+	state varchar(255) null,
+	last_problem mediumtext null
+);
+
+create table wiki
+(
+	name varchar(255) not null,
+	version int not null,
+	time bigint null,
+	author text null,
+	ipnr text null,
+	text longtext null,
+	comment text null,
+	readonly int null,
+	constraint sqlite_autoindex_wiki_1
+		unique (name, version)
+);
+
+create index wiki_time_idx
+	on wiki (time);
+
+alter table wiki
+	add primary key (name, version);
+
+
+
+
+</textarea>
+                </td>
+                <td width="50%">
+                    <textarea class="dst"></textarea>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+
+
+
+</body>
+</html>
