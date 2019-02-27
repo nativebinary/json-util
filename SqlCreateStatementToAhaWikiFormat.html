@@ -22,12 +22,21 @@
                     .map(function (l) {
 						return l
 							.replace(/^create table /i, '== ')
-							.replace(/^\(/, '[[[#!AhaTracTable tsv 1\nField\tType\tConstraints')
-							.replace(/^\);/, ']]]')
+							.replace(/^\(/, '[[[#!AhaTracTable tsv 1\nLogical Name\tPhysical Name\tType\tConstraints')
+							.replace(/^\);?$/, ']]]')
 							.replace(/^\t(\S+)\s+(\S+)\s+(.+?)/, '$1\t$2\t$3')
 							.replace(/,$/, '');
-					})
-                    .join('\n');
+					}).map(function(l) {
+					    if(l.match(/comment '([^']*)'/)) {
+							return l.replace(/^(.+)(comment '([^']*))'(.*)$/i, '$3\t$1 $4')
+						} else if(l.match(/^\w/)) {
+                            return '\t' + l;
+						} else {
+                            return l;
+						}
+                    })
+                    .join('\n')
+					.replace(/== (\w+)(.+?)\ncomment '([^']*)';/sg, '== $1 - $3$2');
                 $('.dst').val(result);
             }).keyup();
             
@@ -47,11 +56,12 @@
 
 create table Link
 (
-	src varchar(255) not null,
-	dst varchar(255) not null,
-	alias varchar(255) null,
+	src varchar(255) not null comment '시작',
+	dst varchar(255) not null comment '대상',
+	alias varchar(255) null comment '별명',
 	primary key (src, dst)
-);
+)
+comment '링크';
 
 create table Page
 (
