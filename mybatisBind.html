@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>camelCaseUtil</title>
+
+    <style type="text/css">
+      textarea {
+        width: 100%;
+        height: 400px;
+      }
+    </style>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/json2/0.2/json2.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/1.11.0/jquery.min.js"></script>
+    <script type="text/javascript" src="polyfill.js"></script>
+
+    <script type="text/javascript">
+      
+        function generate(p, sql) {
+          const param = JSON.parse(p);
+          console.log(param, sql);
+          let result = sql;
+          for(const key in param) {
+            console.log('key', key);
+            console.log('param[key]', param[key], typeof param[key]);
+      
+            const reg = new RegExp(`#\{${key}[^}]*\}`, 'ig');
+            if (typeof param[key] === 'number') {
+              result = result.replace(reg, `${param[key]}`);
+            } else {
+              result = result.replace(reg, `'${param[key]}'`);
+            }
+          }
+          return result;
+        }
+
+        $(function(){
+          const $param = $('.param');
+          const $src = $('.src');
+
+            $('.param').keyup(function () {
+                $('.dst').val('');
+                $('.dst').val(generate($param.val(), $src.val()));
+            }).scroll(function () {
+                $('.src').scrollTop
+            }).keyup();
+            $('.src').keyup(function () {
+                $('.dst').val('');
+                $('.dst').val(generate($param.val(), $src.val()));
+            }).scroll(function () {
+                $('.src').scrollTop
+            }).keyup();
+            
+        });
+    </script>
+
+</head>
+<body class="camelCaseUtil">
+    <div class="wrap">
+        <h1>nativebinary - mybatis</h1>
+        <h4>
+          <a href="https://nativebinary.github.io/json-util/">json-util</a> | 
+          <a href="https://nativebinary.github.io/json-util/camelCase.html">camelCase</a> | 
+          <a href="https://nativebinary.github.io/json-util/generatePassword.html">generatePassword</a> | 
+          <a href="https://nativebinary.github.io/json-util/mybatisBind.html">mybatisBind</a> | 
+        </h4>
+
+<textarea class="param">
+{ "aaa": "111", "bbb": 222}
+</textarea>
+<textarea class="src">
+SELECT * FROM AAA WHERE #{aaa} = #{bbb}
+</textarea>
+<textarea class="dst"></textarea>
+          
+
+    </div>
+
+
+
+</body>
+</html>
