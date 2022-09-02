@@ -68,7 +68,7 @@ body {
   white-space: pre;
   overflow: scroll;
 }
-.camelCaseUtil .src,
+.ddlToJava .src,
 .SqlCreateStatementToAhaWikiFormat .src {
   width: 100%;
   height: 100%;
@@ -76,9 +76,9 @@ body {
   white-space: pre;
   overflow: scroll;
 }
-.camelCaseUtil .dstJava,
+.ddlToJava .dstJava,
 .SqlCreateStatementToAhaWikiFormat .dstJava,
-.camelCaseUtil .dst,
+.ddlToJava .dst,
 .SqlCreateStatementToAhaWikiFormat .dst {
   width: 100%;
   height: 100%;

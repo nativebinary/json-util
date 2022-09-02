@@ -1,5 +1,7 @@
 = json-util =
 * [https://nativebinary.github.io/json-util/]
-* [https://nativebinary.github.io/json-util/camelCase]
+* [https://nativebinary.github.io/json-util/ddlToJava]
+* [https://nativebinary.github.io/json-util/generatePassword]
+* [https://nativebinary.github.io/json-util/mybatisBind]
 * [https://nativebinary.github.io/json-util/SqlCreateStatementToAhaWikiFormat]
 
