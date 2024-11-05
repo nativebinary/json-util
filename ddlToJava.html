@@ -1,118 +1,111 @@
 <!doctype html>
 <html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>ddlToJava</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>ddlToJava</title>
 
-    <link rel="stylesheet" href="less.css">
+  <link rel="stylesheet" href="less.css">
 
-    <script type="text/javascript" src="//cdn.jsdelivr.net/json2/0.2/json2.js"></script>
-    <script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1.11.0/jquery.min.js"></script>
-    <script type="text/javascript" src="polyfill.js"></script>
+  <script type="text/javascript" src="//cdn.jsdelivr.net/json2/0.2/json2.js"></script>
+  <script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1.11.0/jquery.min.js"></script>
+  <script type="text/javascript" src="polyfill.js"></script>
 
-    <script type="text/javascript">
+  <script type="text/javascript">
 
     function camelCase(v) {
-        v =  v.toLowerCase();
-        return v.replace(/_([a-z])/g, function(match) {
-            return match.substring(1).toUpperCase();
-        });
+      v = v.toLowerCase();
+      return v.replace(/_([a-z])/g, function (match) {
+        return match.substring(1).toUpperCase();
+      });
     }
 
     function generate(sql) {
 
-        var arrayResult = [];
-        var arrayLine = sql.split("\n");
-        arrayLine.forEach(function(v, i){
+      var arrayResult = [];
+      var arrayLine = sql.split("\n");
+      arrayLine.forEach(function (v, i) {
 
-            v = camelCase(v.trim().toLowerCase());
+        v = camelCase(v.trim().toLowerCase());
 
+        if (0 <= v.indexOf("create table")) {
+          v = v.replace('create table', '').trim();
+          v = v[0].toUpperCase() + v.substring(1);
+          v = v.replace(/\(/g, "{");
+          v = v.replace(/\)/g, "}");
 
+          arrayResult.push("public class " + v);
+        } else if (0 <= v.search(/ (nvarchar|varchar|nchar|char|nclob|clob)/)) {
+          v = v.replace(/ (nvarchar|varchar|nchar|char|nclob|clob)(.*)/, function (match) {
+            return "; // " + match.toUpperCase();
+          });
+          arrayResult.push("    public String " + v + ";");
+        } else if (0 <= v.search(/ (number|int)/)) {
+          v = v.replace(/ (number|int)(.*)/, function (match) {
+            return "; // " + match.toUpperCase();
+          });
+          arrayResult.push("    public int " + v + ";");
+        } else if (0 <= v.search(/ (datetime|date)/)) {
+          v = v.replace(/ (datetime|date)(.*)/, function (match) {
+            return "; // " + match.toUpperCase();
+          });
+          arrayResult.push("    public Date " + v + ";");
+        } else {
+          v = v.replace(/\(/g, "{");
+          v = v.replace(/\)/g, "}");
 
-            if (0 <= v.indexOf("create table")) {
-                v = v.replace('create table', '').trim();
-                v = v[0].toUpperCase() + v.substring(1);
-                v = v.replace(/\(/g, "{");
-                v = v.replace(/\)/g, "}");
+          arrayResult.push(v);
+        }
 
-                arrayResult.push("public class " + v);
-            } else if (0 <= v.search(/ (nvarchar|varchar|nchar|char|nclob|clob)/)) {
-                v = v.replace(/ (nvarchar|varchar|nchar|char|nclob|clob)(.*)/, function(match){
-                    return "; // " + match.toUpperCase();
-                });
-                arrayResult.push("    public String " + v + ";");
-            } else if (0 <= v.search(/ (number|int)/)) {
-                v = v.replace(/ (number|int)(.*)/, function(match){
-                    return "; // " + match.toUpperCase();
-                });
-                arrayResult.push("    public int " + v + ";");
-            } else if (0 <= v.search(/ (datetime|date)/)) {
-                v = v.replace(/ (datetime|date)(.*)/, function(match){
-                    return "; // " + match.toUpperCase();
-                });
-                arrayResult.push("    public Date " + v + ";");
-            } else {
-                v = v.replace(/\(/g, "{");
-                v = v.replace(/\)/g, "}");
+      });
 
-                arrayResult.push(v);
-            }
-
-        });
-        
-
-
-        return arrayResult.join("\n");
+      return arrayResult.join("\n");
     }
 
-        $(function(){
-            $('.src').keyup(function () {
-                
-                $('.dstJava').val('');
+    $(function () {
+      $('.src').keyup(function () {
 
-                $('.dstJava').val(generate($(this).val()));
+        $('.dstJava').val('');
 
-            }).scroll(function () {
-                $('.src').scrollTop
-            }).keyup();
-            
-        });
-    </script>
+        $('.dstJava').val(generate($(this).val()));
+
+      }).scroll(function () {
+        $('.src').scrollTop
+      }).keyup();
+
+    });
+  </script>
 
 </head>
+
 <body class="ddlToJava">
-    <div class="wrap">
-        <h1>nativebinary - ddlToJava</h1>
-        <h4>
-            <a href="https://nativebinary.github.io/json-util/">json-util</a> | 
-            <a href="https://nativebinary.github.io/json-util/ddlToJava.html">ddlToJava</a> | 
-            <a href="https://nativebinary.github.io/json-util/generatePassword.html">generatePassword</a> | 
-            <a href="https://nativebinary.github.io/json-util/mybatisBind.html">mybatisBind</a> | 
-          </h4>
-  
+  <div class="wrap">
+    <h1>nativebinary - ddlToJava</h1>
+    <h4>
+      <a href="https://nativebinary.github.io/json-util/">jsonPrettier</a> |
+      <a href="https://nativebinary.github.io/json-util/jsonToJava.html">jsonToJava</a> |
+      <a href="https://nativebinary.github.io/json-util/ddlToJava.html">ddlToJava</a> |
+      <a href="https://nativebinary.github.io/json-util/generatePassword.html">generatePassword</a> |
+      <a href="https://nativebinary.github.io/json-util/mybatisBind.html">mybatisBind</a> |
+    </h4>
 
-        <table style="height: 100%; width: 100%;">
-            <tr>
-                <td width="50%">
-<textarea class="src">
-
+    <table style="height: 100%; width: 100%;">
+      <tr>
+        <td width="50%">
+          <textarea class="src">
 CREATE TABLE TABLE_NAME_UNDER_SCORE (
-    AAA_BBB           VARCHAR2(1) NOT NULL,
-    CCC_DDD_EEE       NUMBER(3)  NULL
-    
+  AAA_BBB           VARCHAR2(1) NOT NULL,
+  CCC_DDD_EEE       NUMBER(3)  NULL
 );
-</textarea>
-                </td>
-                <td width="50%">
-                    <textarea class="dstJava"></textarea>
-                </td>
-            </tr>
-        </table>
-
-    </div>
-
-
-
+          </textarea>
+        </td>
+        <td width="50%">
+          <textarea class="dstJava"></textarea>
+        </td>
+      </tr>
+    </table>
+  </div>
 </body>
+
 </html>

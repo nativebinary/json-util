@@ -4,14 +4,18 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
 .wrap {
-  width: 98%;
   margin: 0 auto;
+  padding: 0 10px;
+  display: flex;
+  flex-direction: column;
 }
+
 .jsonUtil table {
   border-collapse: collapse;
-  width: 100%;
 }
+
 .jsonUtil .json {
   border: 1px solid #bbb;
   font-family: monospace;
@@ -19,69 +23,79 @@ body {
   background-color: #fff;
   word-break: break-all;
 }
+
 .jsonUtil .json .string {
   color: #f00;
 }
+
 .jsonUtil .json .number {
   color: #090;
 }
+
 .jsonUtil .json .boolean {
   color: #00f;
 }
+
 .jsonUtil .json .null {
   color: #f0f;
 }
+
 .jsonUtil .json .key {
   color: #777;
 }
+
 .jsonUtil .json .string,
 .jsonUtil .json .number,
 .jsonUtil .json .boolean,
 .jsonUtil .json .null {
   font-weight: bold;
 }
+
 .jsonUtil .json .pojo {
   cursor: pointer;
 }
+
 .jsonUtil .json .pojo.fold:before {
   content: '+';
 }
+
 .jsonUtil .json .pojo:before {
   content: '-';
 }
+
 .jsonUtil .json .pojo.fold .members {
   display: none;
 }
+
 .jsonUtil .src {
-  width: 100%;
   height: 300px;
+  resize: none;
 }
+
 .jsonUtil .dstJava {
-  width: 100%;
   height: 500px;
   white-space: pre;
   resize: vertical;
 }
+
 .jsonUtil .dstPretty {
-  width: 100%;
-  height: 100%;
   white-space: pre;
   overflow: scroll;
 }
+
 .ddlToJava .src,
 .SqlCreateStatementToAhaWikiFormat .src {
   width: 100%;
-  height: 100%;
   min-height: 500px;
   white-space: pre;
   overflow: scroll;
 }
+
 .ddlToJava .dstJava,
 .SqlCreateStatementToAhaWikiFormat .dstJava,
 .ddlToJava .dst,
 .SqlCreateStatementToAhaWikiFormat .dst {
   width: 100%;
-  height: 100%;
   min-height: 500px;
   white-space: pre;
   overflow: scroll;
